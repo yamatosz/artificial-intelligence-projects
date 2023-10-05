@@ -69,14 +69,24 @@ def crossover(parent_1: Cromossomo, parent_2: Cromossomo, n_children: int = 1):
     return childrens
 
 
-def main(dimesion=8, population_s=50, gerations=200, best=0.5, mutation_p=0.01):
+def main(dimesion=8, population_s=50, gerations=200, best=0.5, mutation_p=0.01, test=False):
+    """
+    Função principal para executar o almoritmo genético e plota o cromossomo com a possível solução para o problema
+    das N-Rainhas.
+    :param dimesion: int  - Dimensão do tabuleiro e número de rainhas
+    :param population_s: int - Tamanho da população de indivíduos
+    :param gerations: int - Número de gerações
+    :param best: float - Taxa de seleção em %
+    :param mutation_p: float - Taxa de mutação em %
+    :param test: bool - Parâmetro para a execução de testes(ignorar)
+    """
     population = population_generate(dimesion, population_s)
     population_selected = selection(population, best)
 
-    resultados = []
+    resultados = [[0, population_selected[0].fitness]]
     best_cromossomo = population_selected[0].fitness
 
-    for _ in range(gerations):
+    for _ in range(1, gerations):
         new_population = []
         for parent_1 in population_selected:
             parent_2 = choice(population_selected)
@@ -94,13 +104,47 @@ def main(dimesion=8, population_s=50, gerations=200, best=0.5, mutation_p=0.01):
         for cromossomo in new_population:
             population_selected.append(cromossomo)
 
-        population_selected = selection(population_selected, best)
-
         resultados.append([_, best_cromossomo])
+        population_selected = selection(population_selected, best)
+    if not test:
+        print(f'{population_selected[0]}')
+        plot_cromossomo(population_selected[0])
+        plot_resultados(resultados)
+    return [resultados, population_selected[0].fitness]
 
-    print(f'{population_selected[0]}')
-    plot_cromossomo(population_selected[0])
-    plot_resultados(resultados)
+
+def tests(dimension: int = 8, population_s: int = 50, gerations: int = 200, best=0.5, mutation_p=0.01, n_tests: int = 10):
+    results_tests = []
+    testes = []
+    geracoes = []
+    geracoes_m = 0
+    bests_fitness = []
+    for test in range(n_tests):
+        teste = main(dimension, population_s, gerations,
+                     best, mutation_p, test=True)
+        best_fitness = teste[1]
+        resultados = teste[0]
+        i = 0
+        best_generation = i
+        for _ in resultados:
+            if resultados[i][1] == best_fitness:
+                best_generation = i
+                break
+            i += 1
+        testes.append(test+1)
+        geracoes.append(best_generation)
+        geracoes_m += best_generation
+        bests_fitness.append(best_fitness)
+        results_tests.append([test+1, best_fitness, best_generation])
+    plt.plot(geracoes, label="Número de Geração")
+    plt.plot(bests_fitness, label="Melhor Fitness das Gerações")
+    media = int(geracoes_m/len(geracoes))
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    plt.savefig(f'tests_n_{dimension}')
+    print(f'Media de gerações: {media}')
+    return media
 
 
 def plot_resultados(resultados):
@@ -141,6 +185,3 @@ def plot_cromossomo(cromossomo: Cromossomo):
     for j in range(1, cromossomo.dimension+1):
         print("----", end="")
     print("\n", end="")
-
-
-main()
