@@ -69,18 +69,18 @@ def crossover(parent_1: Cromossomo, parent_2: Cromossomo, n_children: int = 1):
     return childrens
 
 
-def main(dimesion=8, population_s=50, gerations=200, best=0.5, mutation_p=0.01, test=False):
+def main(dimension=8, population_s=50, gerations=200, best=0.5, mutation_p=0.01, test=False):
     """
     Função principal para executar o almoritmo genético e plota o cromossomo com a possível solução para o problema
     das N-Rainhas.
-    :param dimesion: int  - Dimensão do tabuleiro e número de rainhas
+    :param dimension: int  - Dimensão do tabuleiro e número de rainhas
     :param population_s: int - Tamanho da população de indivíduos
     :param gerations: int - Número de gerações
     :param best: float - Taxa de seleção em %
     :param mutation_p: float - Taxa de mutação em %
     :param test: bool - Parâmetro para a execução de testes(ignorar)
     """
-    population = population_generate(dimesion, population_s)
+    population = population_generate(dimension, population_s)
     population_selected = selection(population, best)
 
     resultados = [[0, population_selected[0].fitness]]
